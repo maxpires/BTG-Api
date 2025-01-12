@@ -8,14 +8,12 @@ builder.Services.AddControllers();
 
 builder.Services.RegisterDI();
 
-//Banco
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwagger();
+
 builder.Services.AddDbContext<DefaultContext>(options =>
-     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-         sqlServerOptions =>
-         {
-             //sqlServerOptions.MigrationsAssembly("API");
-         }
-     ), ServiceLifetime.Scoped, ServiceLifetime.Scoped
+     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped, ServiceLifetime.Scoped
  );
 
 var app = builder.Build();
@@ -27,5 +25,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseSwaggerConfig();
 
 app.Run();

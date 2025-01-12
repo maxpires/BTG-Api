@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BTG.Application.Services;
+using BTG.Domain.Contracts.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BTG.Application.Ioc
 {
@@ -6,7 +8,7 @@ namespace BTG.Application.Ioc
     {
         public static void Register(IServiceCollection services)
         {
-
+            services.AddTransient<IPedidoService, PedidoService>();
         }
     }
 }
