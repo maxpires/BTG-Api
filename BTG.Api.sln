@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTG.Infrastructure", "BTG.I
 		{EB39D610-60F4-48DC-91F5-AC9F71B5C41F} = {EB39D610-60F4-48DC-91F5-AC9F71B5C41F}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BTG.MicroservicoRabbitMQ", "BTG.MicroservicoRabbitMQ\BTG.MicroservicoRabbitMQ.csproj", "{BFD2DC10-CD95-4C48-A8AC-33DB80AC0C49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{54D42FF0-1DA7-48BE-AC53-F03FD9580B32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54D42FF0-1DA7-48BE-AC53-F03FD9580B32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54D42FF0-1DA7-48BE-AC53-F03FD9580B32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFD2DC10-CD95-4C48-A8AC-33DB80AC0C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFD2DC10-CD95-4C48-A8AC-33DB80AC0C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFD2DC10-CD95-4C48-A8AC-33DB80AC0C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFD2DC10-CD95-4C48-A8AC-33DB80AC0C49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,5 +7,6 @@ namespace BTG.Domain.Contracts.Repositories
         Task<ValorTotalPedidoOutput?> GetValorTotalDoPedido(int codigoPedido);
         Task<QtdPedidoClienteOutput?> GetQuantidadePedidosPorCliente(int codigoCliente);
         Task<IEnumerable<PedidoOutput>> GetListaPedidosPorCliente(int codigoCliente);
+        Task<bool> Inserir(PedidoInput pedido);
     }
 }

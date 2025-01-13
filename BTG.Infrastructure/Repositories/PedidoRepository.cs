@@ -1,4 +1,5 @@
 ﻿using BTG.Domain.Contracts.Repositories;
+using BTG.Domain.Entities;
 using BTG.Domain.InputOutput;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,6 +66,26 @@ namespace BTG.Infrastructure.Repositories
                 CodigoPedido = codigoPedido,
                 ValorTotal = total
             };         
+        }
+
+        public async Task<bool> Inserir(PedidoInput pedido)
+        {
+            _db.Database.BeginTransaction();
+
+            var cliente = await _db.Cliente.Where(x => x.CodigoCliente == pedido.codigoCliente).FirstOrDefaultAsync();
+
+            if (cliente == null)
+            {
+                _db.Add(new ClienteEntity
+                {
+                    CodigoCliente = pedido.codigoCliente
+                });
+            }
+
+            var ret = await _db.SaveChangesAsync() > 0 ? true : false;
+            _db.Database.CommitTransaction();
+
+            return ret;
         }
     }
 }
