@@ -1,0 +1,97 @@
+version: '3.8'
+services:
+    sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        container_name: btg-db-sqlserver
+        environment:
+            ACCEPT_EULA: Y
+            SA_PASSWORD: Desafio@BTG
+        ports:
+            - "1433:1433"
+        volumes:
+            - sql_data:/var/opt/mssql
+        networks:
+            - btgnetwork
+        healthcheck:
+            test: ["CMD", "sqlcmd", "-S", "sqlserver", "-U", "sa", "-P", "Desafio@BTG", "-Q", "SELECT 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+      
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        hostname: "rabbitmq"
+        environment:
+            TZ: America/Sao_Paulo
+            RABBITMQ_DATA_DIR: /var/lib/rabbitmq
+            RABBITMQ_VERSION: 3.12.1
+            RABBITMQ_HOME: /opt/rabbitmq
+            HOME: /var/lib/rabbitmq
+            LANG: C.UTF-8
+            LANGUAGE: C.UTF-8
+            LC_ALL: C.UTF-8
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+            RABBITMQ_HOST: rabbitmq
+            RABBITMQ_PORT: 5672
+        volumes:
+            - /var/lib/rabbitmq
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+            - "5671:5671"
+        depends_on:
+            - sqlserver
+        restart: unless-stopped
+        labels:
+            - 'org.opencontainers.image.ref.name=ubuntu'
+            - 'org.opencontainers.image.version=22.04'
+        runtime: runc
+        networks:
+            - btgnetwork
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:15672"]
+            interval: 10s
+            timeout: 15s
+            retries: 5
+
+    btg-api:
+        image: piresmaximiliano/btg-api
+        container_name: btg-api
+        environment:
+          ASPNETCORE_ENVIRONMENT: container
+          DOTNET_RUNNING_IN_CONTAINER: true
+        ports:
+          - "5000:5000"
+        depends_on:
+          - sqlserver
+          - rabbitmq
+        runtime: runc
+        networks:
+          - btgnetwork
+        restart: always
+
+    btg-microservico:
+        image: piresmaximiliano/btg-microservico
+        container_name: btg-microservico
+        environment:
+          DOTNET_RUNNING_IN_CONTAINER: true
+        ports:
+          - "5001:5001"
+        depends_on:
+          - sqlserver
+          - rabbitmq
+          - btg-api
+        runtime: runc
+        networks:
+          - btgnetwork
+        restart: always  
+
+networks:
+    btgnetwork:
+        driver: bridge
+
+volumes:
+  sql_data:
+    driver: local

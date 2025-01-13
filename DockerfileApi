@@ -1,0 +1,28 @@
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://localhost:5000
+
+ENV ASPNETCORE_ENVIRONMENT=container
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /app
+COPY ["BTG.Api/BTG.Api.csproj", "BTG.Api/"]
+COPY ["BTG.Application/BTG.Application.csproj", "BTG.Application/"]
+COPY ["BTG.Domain/BTG.Domain.csproj", "BTG.Domain/"]
+COPY ["BTG.Infrastructure/BTG.Infrastructure.csproj", "BTG.Infrastructure/"]
+RUN dotnet restore "./BTG.Api/BTG.Api.csproj"
+COPY . .
+WORKDIR "/app/BTG.Api"
+RUN dotnet build "./BTG.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./BTG.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "BTG.Api.dll"]

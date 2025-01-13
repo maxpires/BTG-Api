@@ -16,6 +16,8 @@ builder.Services.AddDbContext<DefaultContext>(options =>
      options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped, ServiceLifetime.Scoped
  );
 
+builder.WebHost.ConfigureKestrel(opt => opt.ListenAnyIP(5000));
+
 var app = builder.Build();
 
 MigrationStart.Population(app);
