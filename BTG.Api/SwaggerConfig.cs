@@ -8,7 +8,7 @@
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-                c.RoutePrefix = string.Empty;  // Define a página principal do Swagger UI no root
+                c.RoutePrefix = string.Empty;
             });
         }
 

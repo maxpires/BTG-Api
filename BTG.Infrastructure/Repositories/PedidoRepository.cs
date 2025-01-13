@@ -25,9 +25,9 @@ namespace BTG.Infrastructure.Repositories
                         CodigoCliente = p.Cliente.CodigoCliente,
                         Itens = (List<Item>)p.DetalhesPedidos.Select(dp => new Item
                         {
-                            Produto = dp.Produto.Produto,
-                            Quantidade = dp.Produto.Quantidade,
-                            Preco = dp.Produto.Preco
+                            Produto = dp.Produto,
+                            Quantidade = dp.Quantidade,
+                            Preco = dp.Preco
                         })
                     })
                     .ToListAsync();
@@ -53,13 +53,12 @@ namespace BTG.Infrastructure.Repositories
         public async Task<ValorTotalPedidoOutput?> GetValorTotalDoPedido(int codigoPedido)
         {
             var pedido = await _db.DetalhesPedido
-                .Include(x => x.Produto)
                 .Where(dp => dp.CodigoPedido == codigoPedido).ToListAsync();
 
             if (pedido.Count() == 0)
                 return null;
 
-            var total = pedido.Sum(x => x.Produto.Quantidade * x.Produto.Preco);
+            var total = pedido.Sum(x => x.Quantidade * x.Preco);
 
             return new ValorTotalPedidoOutput
             {
@@ -70,10 +69,17 @@ namespace BTG.Infrastructure.Repositories
 
         public async Task<bool> Inserir(PedidoInput pedido)
         {
+
+            var exitePedido = await _db.Pedido.Where(x => x.CodigoPedido == pedido.codigoPedido).FirstOrDefaultAsync();
+            if (exitePedido != null)
+            {
+                throw new Exception($"Pedido { pedido.codigoPedido } já processado.");
+            }
+
+
             _db.Database.BeginTransaction();
 
             var cliente = await _db.Cliente.Where(x => x.CodigoCliente == pedido.codigoCliente).FirstOrDefaultAsync();
-
             if (cliente == null)
             {
                 _db.Add(new ClienteEntity
@@ -82,7 +88,23 @@ namespace BTG.Infrastructure.Repositories
                 });
             }
 
+            var pedidoEntity = new PedidoEntity
+            {
+                CodigoPedido = pedido.codigoPedido,
+                CodigoCliente = pedido.codigoCliente,
+                DetalhesPedidos = pedido.itens.Select(x => new DetalhesPedidoEntity
+                {
+                    CodigoPedido = pedido.codigoPedido,
+                    Produto = x.produto,
+                    Quantidade = x.quantidade,
+                    Preco = x.preco
+                }).ToList()
+            };
+
+            _db.Add(pedidoEntity);
+
             var ret = await _db.SaveChangesAsync() > 0 ? true : false;
+            
             _db.Database.CommitTransaction();
 
             return ret;

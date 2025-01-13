@@ -14,7 +14,6 @@ namespace BTG.Infrastructure
         public static void RegisterModelsMapping(this ModelBuilder modelBuilder)
         {
             new ClienteMap().Map(modelBuilder.Entity<ClienteEntity>());
-            new ProdutoMap().Map(modelBuilder.Entity<ProdutoEntity>());
             new PedidoMap().Map(modelBuilder.Entity<PedidoEntity>());
             new DetalhesPedidoMap().Map(modelBuilder.Entity<DetalhesPedidoEntity>());
         }

@@ -9,7 +9,6 @@
 
     public class Item
     {
-        public int? CodigoProduto { get; set; }
         public string Produto { get; set; }
         public int Quantidade { get; set; }
         public decimal Preco { get; set; }

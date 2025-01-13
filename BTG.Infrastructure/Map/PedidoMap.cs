@@ -1,8 +1,6 @@
-﻿using Azure;
-using BTG.Domain.Entities;
+﻿using BTG.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace BTG.Infrastructure.Map
 {
@@ -12,13 +10,13 @@ namespace BTG.Infrastructure.Map
         {
             builder.ToTable("Pedido");
             builder.HasKey(x => x.CodigoPedido);
-            builder.Property(x => x.CodigoPedido).ValueGeneratedOnAdd();            
+            builder.Property(x => x.CodigoPedido).ValueGeneratedNever();
 
-            builder.HasOne(p => p.Cliente)
-                  .WithMany(c => c.Pedidos)
-                  .HasForeignKey(p => p.CodigoCliente);
-
-            
+            builder
+                .HasMany(x => x.DetalhesPedidos)
+                .WithOne(x => x.Pedido)
+                .HasForeignKey(x => x.CodigoPedido)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

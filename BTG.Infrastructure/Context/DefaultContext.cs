@@ -6,7 +6,6 @@ namespace BTG.Infrastructure
     public class DefaultContext : DbContext
     {
         public DbSet<ClienteEntity> Cliente => Set<ClienteEntity>();
-        public DbSet<ProdutoEntity> Produto => Set<ProdutoEntity>();
         public DbSet<PedidoEntity> Pedido => Set<PedidoEntity>();
         public DbSet<DetalhesPedidoEntity> DetalhesPedido => Set<DetalhesPedidoEntity>();
 
@@ -31,9 +30,6 @@ namespace BTG.Infrastructure
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            //Maxxxxx desativa Log do Entity,não fica imprimindo na tela
-            //optionsBuilder.UseLoggerFactory(_loggerFactory)
-            //    .EnableSensitiveDataLogging();
         }
     }
 }

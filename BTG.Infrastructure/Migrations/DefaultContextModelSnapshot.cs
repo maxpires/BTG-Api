@@ -24,10 +24,7 @@ namespace BTG.Infrastructure.Migrations
             modelBuilder.Entity("BTG.Domain.Entities.ClienteEntity", b =>
                 {
                     b.Property<int>("CodigoCliente")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CodigoCliente"));
 
                     b.HasKey("CodigoCliente");
 
@@ -36,44 +33,14 @@ namespace BTG.Infrastructure.Migrations
 
             modelBuilder.Entity("BTG.Domain.Entities.DetalhesPedidoEntity", b =>
                 {
-                    b.Property<int>("CodigoPedido")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CodigoProduto")
-                        .HasColumnType("int");
-
-                    b.HasKey("CodigoPedido", "CodigoProduto");
-
-                    b.HasIndex("CodigoProduto");
-
-                    b.ToTable("DetalhesPedido", (string)null);
-                });
-
-            modelBuilder.Entity("BTG.Domain.Entities.PedidoEntity", b =>
-                {
-                    b.Property<int>("CodigoPedido")
+                    b.Property<int>("CodigoDetalhesPedido")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CodigoPedido"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CodigoDetalhesPedido"));
 
-                    b.Property<int>("CodigoCliente")
+                    b.Property<int>("CodigoPedido")
                         .HasColumnType("int");
-
-                    b.HasKey("CodigoPedido");
-
-                    b.HasIndex("CodigoCliente");
-
-                    b.ToTable("Pedido", (string)null);
-                });
-
-            modelBuilder.Entity("BTG.Domain.Entities.ProdutoEntity", b =>
-                {
-                    b.Property<int>("CodigoProduto")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CodigoProduto"));
 
                     b.Property<decimal>("Preco")
                         .HasColumnType("decimal(10,2)");
@@ -85,9 +52,26 @@ namespace BTG.Infrastructure.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
-                    b.HasKey("CodigoProduto");
+                    b.HasKey("CodigoDetalhesPedido");
 
-                    b.ToTable("Produto", (string)null);
+                    b.HasIndex("CodigoPedido");
+
+                    b.ToTable("DetalhesPedido", (string)null);
+                });
+
+            modelBuilder.Entity("BTG.Domain.Entities.PedidoEntity", b =>
+                {
+                    b.Property<int>("CodigoPedido")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CodigoCliente")
+                        .HasColumnType("int");
+
+                    b.HasKey("CodigoPedido");
+
+                    b.HasIndex("CodigoCliente");
+
+                    b.ToTable("Pedido", (string)null);
                 });
 
             modelBuilder.Entity("BTG.Domain.Entities.DetalhesPedidoEntity", b =>
@@ -98,15 +82,7 @@ namespace BTG.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BTG.Domain.Entities.ProdutoEntity", "Produto")
-                        .WithMany("DetalhesPedidos")
-                        .HasForeignKey("CodigoProduto")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Pedido");
-
-                    b.Navigation("Produto");
                 });
 
             modelBuilder.Entity("BTG.Domain.Entities.PedidoEntity", b =>
@@ -126,11 +102,6 @@ namespace BTG.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("BTG.Domain.Entities.PedidoEntity", b =>
-                {
-                    b.Navigation("DetalhesPedidos");
-                });
-
-            modelBuilder.Entity("BTG.Domain.Entities.ProdutoEntity", b =>
                 {
                     b.Navigation("DetalhesPedidos");
                 });

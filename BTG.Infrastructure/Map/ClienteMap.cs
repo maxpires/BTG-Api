@@ -10,7 +10,12 @@ namespace BTG.Infrastructure.Map
         {
             builder.ToTable("Cliente");
             builder.HasKey(x => x.CodigoCliente);
-            builder.Property(x => x.CodigoCliente).ValueGeneratedOnAdd();
+            builder.Property(x => x.CodigoCliente).ValueGeneratedNever();
+
+            builder
+                .HasMany(x => x.Pedidos)
+                .WithOne(x => x.Cliente)
+                .HasForeignKey(x => x.CodigoCliente);
         }
     }
 }

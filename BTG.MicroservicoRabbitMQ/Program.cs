@@ -9,24 +9,37 @@ using BTG.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var connectionStringBD = "Server=localhost,1444;Database=db_btg; TrustServerCertificate=True; User ID=sa;Password=Desafio@BTG";
 var connectionStringRabbit = "amqp://guest:guest@localhost:5672";
 
+Console.WriteLine("###########################");
+Console.WriteLine("#       DESAFIO BTG       #");
+Console.WriteLine("#  Consumo Fila RabbitMQ  #");
+Console.WriteLine("###########################");
+Console.WriteLine("");
 Console.WriteLine("Iniciando Microserviço...");
 
 var host = Host.CreateDefaultBuilder(args)
+    .ConfigureLogging(log =>
+    {
+        log.ClearProviders();
+        log.AddConsole();
+        log.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
+    })
     .ConfigureServices((_, services) =>
     {
         services.AddScoped<IProcessadorMensagemService, ProcessadorMensagemService>();
-        services.AddScoped<IProcessadorMensagem, ProcessadorMensagem>();
         services.AddTransient<IPedidoService, PedidoService>();
         services.AddTransient<IPedidoRepository, PedidoRepository>();
 
         services.AddDbContext<DefaultContext>(opt => opt.UseSqlServer());
 
         services.AddDbContext<DefaultContext>(options =>
-            options.UseSqlServer(connectionStringBD), ServiceLifetime.Scoped, ServiceLifetime.Scoped
+            options
+                .UseSqlServer(connectionStringBD)
+                .EnableSensitiveDataLogging(false), ServiceLifetime.Scoped, ServiceLifetime.Scoped
         );
 
         services.AddSingleton(p =>

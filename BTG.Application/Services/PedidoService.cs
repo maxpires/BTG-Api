@@ -26,10 +26,5 @@ namespace BTG.Application.Services
         {
             return await _pedidoRepository.GetValorTotalDoPedido(codigoPedido);
         }
-
-        public async Task<bool> Inserir(PedidoInput pedido)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

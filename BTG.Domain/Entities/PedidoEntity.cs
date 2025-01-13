@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace BTG.Domain.Entities
+﻿namespace BTG.Domain.Entities
 {
     public class PedidoEntity
     {

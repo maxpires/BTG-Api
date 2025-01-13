@@ -9,18 +9,9 @@ namespace BTG.Infrastructure.Map
         public override void Map(EntityTypeBuilder<DetalhesPedidoEntity> builder)
         {
             builder.ToTable("DetalhesPedido");
-            builder.HasKey(dp => new { dp.CodigoPedido, dp.CodigoProduto });
-
-            builder.HasOne(dp => dp.Pedido)
-                  .WithMany(p => p.DetalhesPedidos)
-                  .HasForeignKey(dp => dp.CodigoPedido)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasOne(dp => dp.Produto)
-                  .WithMany(pr => pr.DetalhesPedidos)
-                  .HasForeignKey(dp => dp.CodigoProduto)
-                  .OnDelete(DeleteBehavior.Restrict);
-
+            builder.HasKey(x => x.CodigoDetalhesPedido);
+            builder.Property(x => x.CodigoDetalhesPedido).ValueGeneratedOnAdd();
+            builder.Property(x => x.Preco).HasColumnType("decimal(10,2)");
         }
     }
 }

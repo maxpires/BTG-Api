@@ -4,9 +4,6 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Diagnostics;
 using System.Text;
-using System.Text.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
 
 namespace BTG.Infrastructure.RabbitMQ
 {
@@ -32,46 +29,45 @@ namespace BTG.Infrastructure.RabbitMQ
                 AutomaticRecoveryEnabled = true,
             };
 
-            //using (var conexao = await factory.CreateConnectionAsync())
-            //{
-                try
+            try
+            {
+                using var conexao = await factory.CreateConnectionAsync();
+                using var channel = await conexao.CreateChannelAsync();
+
+                await channel.QueueDeclareAsync(_fila, durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+                var consumer = new AsyncEventingBasicConsumer(channel);
+                consumer.ReceivedAsync += async (model, evt) =>
                 {
-                    using var conexao = await factory.CreateConnectionAsync();
-                    using var channel = await conexao.CreateChannelAsync();
+                    var message = Encoding.UTF8.GetString(evt.Body.ToArray());
 
-                    await channel.QueueDeclareAsync(_fila, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                    var stopwatch = new Stopwatch();
+                    stopwatch.Start();
 
-                    var consumer = new AsyncEventingBasicConsumer(channel);
-                    consumer.ReceivedAsync += async (model, evt) =>
-                    {
-                        var message = Encoding.UTF8.GetString(evt.Body.ToArray());
+                    Console.WriteLine($"[{ DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") }] Inicia Processamento Fila");
 
-                        var stopwatch = new Stopwatch();
-                        stopwatch.Start();
+                    var resp = await _processadorMensagemService.ProcessarMensagemAsync(new Mensagem { FilaNome = _fila, Conteudo = message });
+                        
+                    if (resp)
+                        Console.WriteLine($"Processado com Sucesso");
 
-                        Console.WriteLine($"{ DateTime.Now.ToShortTimeString() } Inicia Processamento Fila");
+                    stopwatch.Stop();
+                    Console.WriteLine($"[{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}] Fim Processamento. Processado em: { stopwatch.ElapsedMilliseconds }ms");
+                };
 
-                        await _processadorMensagemService.ProcessarMensagemAsync(new Mensagem { FilaNome = _fila, Conteudo = message });
-
-                        stopwatch.Stop();
-                        Console.WriteLine($"Fim Processamento Fila {message}. Processado em: {stopwatch.ElapsedTicks }");
-                    };
-
-                    _ = channel.BasicConsumeAsync(_fila, autoAck: true, consumer);
-                    //};
+                _ = channel.BasicConsumeAsync(_fila, autoAck: true, consumer);
                     
-                    Console.WriteLine($"Iniciado com sucesso");
-                    await Task.Delay(-1);
+                Console.WriteLine($"Iniciado com sucesso");
+                await Task.Delay(-1);
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erro no Start da Fila. Detalhes: {ex.Message}");
-                    await Task.Delay(TimeSpan.FromSeconds(10));
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro na Iniciação com o RabbitMQ. Detalhes: {ex.Message}");
+                await Task.Delay(TimeSpan.FromSeconds(10));
+            }
 
-                while (true) { Task.Delay(100).Wait(); }
-            //};
+            while (true) { Task.Delay(100).Wait(); }
         }        
     }
 }

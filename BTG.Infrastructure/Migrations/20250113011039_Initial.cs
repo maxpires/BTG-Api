@@ -5,7 +5,7 @@
 namespace BTG.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,6 @@ namespace BTG.Infrastructure.Migrations
                 columns: table => new
                 {
                     CodigoCliente = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -23,26 +22,10 @@ namespace BTG.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Produto",
-                columns: table => new
-                {
-                    CodigoProduto = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Produto = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantidade = table.Column<int>(type: "int", nullable: false),
-                    Preco = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Produto", x => x.CodigoProduto);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Pedido",
                 columns: table => new
                 {
-                    CodigoPedido = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CodigoPedido = table.Column<int>(type: "int", nullable: false),
                     CodigoCliente = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -60,30 +43,28 @@ namespace BTG.Infrastructure.Migrations
                 name: "DetalhesPedido",
                 columns: table => new
                 {
+                    CodigoDetalhesPedido = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CodigoPedido = table.Column<int>(type: "int", nullable: false),
-                    CodigoProduto = table.Column<int>(type: "int", nullable: false)
+                    Produto = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    Preco = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetalhesPedido", x => new { x.CodigoPedido, x.CodigoProduto });
+                    table.PrimaryKey("PK_DetalhesPedido", x => x.CodigoDetalhesPedido);
                     table.ForeignKey(
                         name: "FK_DetalhesPedido_Pedido_CodigoPedido",
                         column: x => x.CodigoPedido,
                         principalTable: "Pedido",
                         principalColumn: "CodigoPedido",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DetalhesPedido_Produto_CodigoProduto",
-                        column: x => x.CodigoProduto,
-                        principalTable: "Produto",
-                        principalColumn: "CodigoProduto",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetalhesPedido_CodigoProduto",
+                name: "IX_DetalhesPedido_CodigoPedido",
                 table: "DetalhesPedido",
-                column: "CodigoProduto");
+                column: "CodigoPedido");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pedido_CodigoCliente",
@@ -99,9 +80,6 @@ namespace BTG.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pedido");
-
-            migrationBuilder.DropTable(
-                name: "Produto");
 
             migrationBuilder.DropTable(
                 name: "Cliente");
